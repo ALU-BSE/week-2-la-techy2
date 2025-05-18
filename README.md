@@ -1,158 +1,101 @@
-[![Open in Codespaces](https://classroom.github.com/assets/launch-codespace-2972f46106e565e64193e422d61a12cf1da4916b45550586e14ef0a7c637dd04.svg)](https://classroom.github.com/open-in-codespaces?assignment_repo_id=19558476)
-# **Django Pagination Hands-On Group Activity**  
-**Objective:** Create a Django project, populate a model with AI-generated data, and implement pagination to display records efficiently.  
 
-## **Activity Overview**  
-- **Duration:** 30 minutes  
-- **Group Size:** 2 learners per group  
-- **Prerequisites:** Basic Python knowledge, Django installed (`pip install django`)  
-- **Tools Needed:** Python, Django, Browser, AI Tool (e.g., ChatGPT, Mockaroo)  
+````markdown
+# Books Project
 
+This is a Django project that manages a collection of books with pagination support.
 
-## **Step-by-Step Instructions**  
+---
 
-### **1. Create a New Django Project**  
-**Guidelines:**  
-1. Open a terminal and run:  
-   ```bash
-   django-admin startproject pagination_project
-   cd pagination_project
-   python manage.py startapp books
-   ```
-2. Add `'books'` to `INSTALLED_APPS` in `settings.py`.  
-3. Run migrations:  
-   ```bash
-   python manage.py migrate
-   ```
+## Project Overview
 
-### **2. Define a Single Model**  
-**Task:** Create a `Book` model with fields:  
-- `title` (CharField)  
-- `author` (CharField)  
-- `published_year` (IntegerField)  
+This project allows users to view a list of books stored in the database. The data was initially loaded from a JSON fixture file. The project uses Django ORM for data management and includes features such as pagination for efficient browsing.
 
-```python
-# books/models.py
-from django.db import models
+---
 
-class Book(models.Model):
-    title = models.CharField(max_length=200)
-    author = models.CharField(max_length=100)
-    published_year = models.IntegerField()
+## Setup Instructions
 
-    def __str__(self):
-        return self.title
-```
-- Register the model in `admin.py`:  
-  ```python
-  from django.contrib import admin
-  from .models import Book
-  admin.site.register(Book)
-  ```
-- Run:  
-  ```bash
-  python manage.py makemigrations
-  python manage.py migrate
-  ```
+Follow these steps to get the project running locally:
 
+### 1. Clone the Repository
 
-### **3. Populate the Model with AI-Generated Data**  
-**Option 1: Use ChatGPT**  
-- Prompt: *"Generate 50 fake book records in JSON format with title, author, and published_year."*  
-- Save the output as `books.json` in a `fixtures` folder.  
-- Load data:  
-  ```bash
-  python manage.py loaddata books.json
-  ```
+```bash
+git clone https://github.com/ALU-BSE/week-2-la-techy2
+cd week-2-la-techy2
+````
 
-**Option 2: Use Mockaroo**  
-- Visit [Mockaroo](https://www.mockaroo.com/) and configure fields:  
-  - `title` (Book Title)  
-  - `author` (Full Name)  
-  - `published_year` (Number, 1900-2023)  
-- Download as JSON and load as above.  
+### 2. Create and Activate a Virtual Environment
 
-
-### **4. Implement Pagination**  
-#### **Step 1: Create a View**  
-```python
-# books/views.py
-from django.core.paginator import Paginator
-from django.shortcuts import render
-from .models import Book
-
-def book_list(request):
-    books = Book.objects.all().order_by('title')
-    paginator = Paginator(books, 5)  # 5 books per page
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    return render(request, 'books/book_list.html', {'page_obj': page_obj})
+```bash
+python -m venv venv
+# Windows
+venv\Scripts\activate
+# macOS/Linux
+source venv/bin/activate
 ```
 
-#### **Step 2: Add URL**  
-```python
-# pagination_project/urls.py
-from django.contrib import admin
-from django.urls import path
-from books.views import book_list
+### 3. Install Dependencies
 
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('books/', book_list, name='book_list'),
-]
+```bash
+pip install -r requirements.txt
 ```
 
-#### **Step 3: Create a Template**  
-```html
-<!-- books/templates/books/book_list.html -->
-<h1>Book List</h1>
-<ul>
-  {% for book in page_obj %}
-    <li>{{ book.title }} ({{ book.published_year }}) by {{ book.author }}</li>
-  {% endfor %}
-</ul>
+### 4. Apply Migrations
 
-<div class="pagination">
-  <span class="step-links">
-    {% if page_obj.has_previous %}
-      <a href="?page=1">&laquo; first</a>
-      <a href="?page={{ page_obj.previous_page_number }}">previous</a>
-    {% endif %}
-
-    <span class="current">
-      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-    </span>
-
-    {% if page_obj.has_next %}
-      <a href="?page={{ page_obj.next_page_number }}">next</a>
-      <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
-    {% endif %}
-  </span>
-</div>
+```bash
+python manage.py migrate
 ```
 
-### **5. Test & Discuss**  
-- Run the server:  
-  ```bash
-  python manage.py runserver
-  ```
-- Visit `http://127.0.0.1:8000/books/` and navigate pages.  
-- **Discussion Questions:**  
-  - Why is pagination important for large datasets?  
-  - How would you customize items per page dynamically?  
-  - What happens if `page` is invalid?  
+### 5. Load Initial Data
+
+```bash
+python manage.py loaddata books/fixtures/books.json
+```
+
+### 6. Run the Development Server
+
+```bash
+python manage.py runserver
+```
+
+You can now visit `http://127.0.0.1:8000` in your browser to see the project in action.
+
+---
+
+## Project Structure
+
+* `books/` — Django app that contains the Book model and related views.
+* `books/fixtures/books.json` — Initial data loaded into the database.
+* `core/` — Core project settings and configuration files. (pagination_project) 
+* `manage.py` — Django management script.
+* `README.md` — This file.
+* `Instructions.md` — Full instructions provided by the tutor.
+
+---
+
+## Tutor Instructions
+
+For the detailed original instructions from the tutor, please refer to the file:
+
+[_Instructions.md](Instructions.md)
+
+---
+
+## Notes
+
+* Make sure your virtual environment is activated before running any Django commands.
+* If you encounter any missing packages or errors, please ensure dependencies are installed properly.
+* The Book model currently includes fields such as `title`, `author`, `published_date`, and more as defined in the model.
+
+---
+
+## Contact
+
+If you have questions or need help, feel free to reach out to me  or your tutor.
+
+---
+
+*Happy coding!*
+
+```
 
 
-## **Bonus Challenges**  
-**Dynamic Items Per Page:** Add a dropdown to change `per_page` value.  
-**Styled Pagination:** Use Bootstrap for better UI.  
-**Search + Pagination:** Filter books by author/year before paginating.  
-
-
-## **Conclusion**  
-Learners will:  
-- Set up a Django project from scratch.
-- Populate a model using AI tools.
-- Implement and customize pagination.  
-
-**Happy Coding!** 
